@@ -1,30 +1,49 @@
 import { test, expect } from "@playwright/test";
+import { SearchPage } from "../pages/SearchPage";
+
+
+
+let searchPage: SearchPage; 
+
+test.beforeEach(async ({ page }) => {
+
+searchPage = new SearchPage(page);
+await searchPage.visitCartPage();
+
+});
 
 test.describe("Suite de tests", async () => {
-  test("Test input Iphone", async ({ page }) => {
-    await test.step("Visita la página", async () => {
-      await page.goto("https://opencart.abstracta.us/");
+  //test("Test input Iphone", async ({ page }) => {
+
+     test("Verify navigation to Search page ", async () => {
+
+    
+      await expect(searchPage.pageTitle).toBeVisible();
+
+    // await test.step("Visita la página", async () => {
+    //   await page.goto("https://opencart.abstracta.us/");
     });
 
-    await test.step("Realiza una búsqueda", async () => {
-      await page.getByPlaceholder("Search").fill("Iphone");
 
-      await page.getByPlaceholder("Search").press("Enter");
-      await page.pause();
-    });
-  });
+     test( "Verify searched item is displayed", async () => {
 
-  test("Test click to MacBook", async ({ page }) => {
-    await test.step("Visita la página", async () => {
-      await page.goto("https://opencart.abstracta.us/");
+      await searchPage.searchForItem("Iphone");
+      await expect(searchPage.page.getByRole('link', {name: 'iPhone'}).first()).toBeVisible(); 
+    
     });
 
-    await test.step("Click en producto", async () => {
-      await page.getByText("MacBook").click();
-      await page.screenshot({
-        path: "./captures/" + Date.now() + "screenshot.jpg",
-      });
-      await page.pause();
+    test( "Verify navigation to searched item page", async () => {
+
+      
+      await searchPage.selectItem("MacBook");
+      await expect(searchPage.page.getByRole('heading', {name: 'MacBook'})).toBeVisible();
+
     });
-  });
-});
+      //await searchPage.page.pause();
+
+   });
+
+
+
+   
+
