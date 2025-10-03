@@ -1,0 +1,38 @@
+  # Estructura bascia de un workflow
+
+name: CI Automated Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+
+        steps:
+            - name: Checkout repo actual que incluye workflow
+              uses: actions/checkout@v4
+
+
+            - name: Instalar y ejecutar pruebas (Con chromium)
+              run: |
+                npm install
+                npx playwright install
+                npx playwright test --reporter=html
+            
+            - name: Guardar reportes como artefactos
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: playwright-report
+                path: ./playwright-report
+
+            
+            - name: Imprimir URL de reporte en consola
+              if: always()
+              run: |
+                echo "🔗 Reporte disponible en: https://${{github.repository_owner}}.github.io${{github.event.repository.name}}/report-${{github.run_number}}/"
